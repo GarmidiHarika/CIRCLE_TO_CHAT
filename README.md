@@ -1,6 +1,6 @@
 # Gemini-Like Chat (Jetpack Compose Material3)
 Minimal Android project (Kotlin + Jetpack Compose) implementing a Gemini-like chat UI using Material3 design patterns.
-
+**IMP** : Create a Local.properties file in Gradle scripts and place Hugging face token 
 Features:
 - Material3 color scheme with dynamic color fallback
 - Rounded/asymmetrical chat bubbles

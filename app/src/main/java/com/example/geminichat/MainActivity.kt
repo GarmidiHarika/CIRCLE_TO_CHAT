@@ -551,7 +551,7 @@ fun ChatScreen(
 
                                         messages.add(Message(finalResponse, true))
 
-                                        // **IMPORTANT**: Clear the error state *after* adding it to the message list
+                                        // *IMPORTANT: Clear the error state *after adding it to the message list
                                         llmVm.clearState()
                                     }
 
@@ -815,6 +815,7 @@ fun SettingsScreen(
                             // Auto-initialize the model
                             LaunchedEffect(llmVm.downloadComplete, llmVm.needsInitialization) {
                                 if (llmVm.downloadComplete && llmVm.needsInitialization) {
+
                                     llmVm.initializeModel()
                                 }
                             }
@@ -837,6 +838,25 @@ fun SettingsScreen(
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
+                        }
+                    } else {
+                        // Model exists, show delete option
+                        Text(
+                            "Model is downloaded and ready.",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(
+                            onClick = {
+                                llmVm.deleteModel()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        ) {
+                            Text("Delete Model")
                         }
                     }
                 }
@@ -1023,22 +1043,7 @@ fun ImageCropScreen(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // 1. NEW: Use Full Image Button (Skips crop, sends original bitmap)
-            Button(
-                onClick = {
-                    // Call completion with the original, uncropped image
-                    onCropComplete(imageBitmap)
-                },
-                modifier = Modifier.weight(2f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            ) {
-                Text("Use Full Image")
-            }
 
-            // 2. Cancel Button (now positioned after "Use Full Image")
             OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) { Text("Back") }
 
             // 3. Existing Crop Button
@@ -1063,12 +1068,11 @@ fun ImageCropScreen(
                         onCancel()
                     }
                 },
-                modifier = Modifier.weight(2.5f)
+                modifier = Modifier.weight(2f)
             ) { Text(if (canCrop) "Crop selected area" else "Adjust circle") }
         }
     }
 }
-
 fun computeFitBounds(viewSize: IntSize, imgW: Int, imgH: Int): Rect {
     val viewW = viewSize.width.toFloat()
     val viewH = viewSize.height.toFloat()
@@ -1091,7 +1095,7 @@ fun computeFitBounds(viewSize: IntSize, imgW: Int, imgH: Int): Rect {
 }
 
 /**
- * Create a circular crop of the source bitmap given a circle specified in *view* coordinates.
+ * Create a circular crop of the source bitmap given a circle specified in view coordinates.
  *
  * - imageBoundsInView: rectangle where the image is drawn in the view (same coordinate space as circleCenterInView)
  * - circleCenterInView / circleRadiusInView: circle in view coordinates
